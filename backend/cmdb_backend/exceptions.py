@@ -6,7 +6,10 @@ def custom_exception_handler(exc, context):
     if response is None:
         return response
 
-    if isinstance(response.data, dict) and {"code", "message", "data"}.issubset(response.data.keys()):
+    if isinstance(response.data, dict) and (
+        {"code", "message", "data"}.issubset(response.data.keys())
+        or {"code", "msg", "data"}.issubset(response.data.keys())
+    ):
         return response
 
     message = "error"
@@ -15,7 +18,7 @@ def custom_exception_handler(exc, context):
 
     response.data = {
         "code": response.status_code,
-        "message": message,
+        "msg": message,
         "data": response.data,
     }
     return response

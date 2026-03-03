@@ -9,7 +9,10 @@ class UnifiedJSONRenderer(JSONRenderer):
         if status_code == 204:
             return super().render(data, accepted_media_type, renderer_context)
 
-        if isinstance(data, dict) and {"code", "message", "data"}.issubset(data.keys()):
+        if isinstance(data, dict) and (
+            {"code", "message", "data"}.issubset(data.keys())
+            or {"code", "msg", "data"}.issubset(data.keys())
+        ):
             payload = data
         elif status_code >= 400:
             message = "error"
@@ -17,13 +20,13 @@ class UnifiedJSONRenderer(JSONRenderer):
                 message = data["detail"]
             payload = {
                 "code": status_code,
-                "message": message,
+                "msg": message,
                 "data": data,
             }
         else:
             payload = {
                 "code": 0,
-                "message": "success",
+                "msg": "success",
                 "data": data,
             }
 

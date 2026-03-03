@@ -48,8 +48,6 @@ INSTALLED_APPS = [
     "assets",
     "auditlog",
     "iam",
-    "governance",
-    "costs",
 ]
 
 REST_FRAMEWORK = {

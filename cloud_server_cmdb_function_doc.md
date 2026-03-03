@@ -51,8 +51,8 @@
 成功：
 ```json
 {
-  "code": 0,
-  "message": "success",
+  "code": 201,
+  "msg": "success",
   "data": {}
 }
 ```
@@ -60,8 +60,8 @@
 失败：
 ```json
 {
-  "code": 400,
-  "message": "error message",
+  "code": 501,
+  "msg": "error message",
   "data": {}
 }
 ```
@@ -154,6 +154,15 @@
   - 绑定新角色组
   - 同步 Django 用户属性（`is_staff`、`is_superuser`）
 
+### 5.3.7 登录与会话接口
+- `POST /api/v1/iam/login/`
+  - 入参：`username`、`password`
+  - 返回当前用户信息与角色列表
+- `POST /api/v1/iam/logout/`
+  - 退出当前会话
+- `GET /api/v1/iam/me/`
+  - 获取当前登录用户信息
+
 ---
 
 ## 6. 初始化与联调支持
@@ -180,6 +189,30 @@ python manage.py bootstrap_rbac --with-demo-users --password 123456
 
 > 建议：仅用于开发联调环境，生产环境必须禁用测试账号并强制改密。
 
+### 6.2 Apifox 联调建议顺序
+建议在 Apifox 中配置环境变量：
+- `base_url = http://127.0.0.1:8000`
+
+建议测试顺序：
+1. 健康检查：`GET {{base_url}}/healthz`
+2. 登录：`POST {{base_url}}/api/v1/iam/login/`
+   - Body：
+   ```json
+   {
+     "username": "user1",
+     "password": "lol.131400"
+   }
+   ```
+3. 当前用户：`GET {{base_url}}/api/v1/iam/me/`
+4. 资产列表：`GET {{base_url}}/api/v1/assets/accounts/`
+5. 审计列表：`GET {{base_url}}/api/v1/audit/change-logs/`
+6. 退出：`POST {{base_url}}/api/v1/iam/logout/`
+
+常见问题：
+- 返回 `405`：通常是 URL 使用了列表路径却调用了 `PUT/DELETE`，请改为带主键的详情路径。
+  - 例如：更新云账号应使用 `PUT /api/v1/assets/accounts/{id}/`。
+- 返回权限错误：确认当前用户已绑定角色（`管理员`/`运维`/`只读`）。
+
 ---
 
 ## 7. 管理后台能力
@@ -201,7 +234,7 @@ python manage.py bootstrap_rbac --with-demo-users --password 123456
 - 基础角色权限控制
 
 待后续迭代（建议）：
-- Token/JWT 认证与登录接口
+- Token/JWT 认证（当前已支持 Session/Basic 与登录会话接口）
 - 更细粒度菜单权限码校验（按钮级）
 - 差异处理工作流与审批流
 - 成本统计报表 API

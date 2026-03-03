@@ -1,8 +1,8 @@
-from rest_framework import routers
+from django.urls import path
 
-from .views import ChangeLogViewSet
+from .views import change_log_detail, change_log_list
 
-router = routers.DefaultRouter()
-router.register(r"change-logs", ChangeLogViewSet, basename="changelog")
-
-urlpatterns = router.urls
+urlpatterns = [
+	path("change-logs/", change_log_list, name="changelog-list"),
+	path("change-logs/<int:pk>/", change_log_detail, name="changelog-detail"),
+]
