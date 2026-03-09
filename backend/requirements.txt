@@ -3,3 +3,6 @@ PyMySQL==1.1.2
 python-dotenv==1.2.1
 cryptography==46.0.5
 djangorestframework==3.16.1
+djangorestframework-simplejwt==5.5.1
+aliyun-python-sdk-core==2.16.0
+aliyun-python-sdk-ecs==4.24.82

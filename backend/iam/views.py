@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from cmdb_backend.permissions import IsAdminOnly
 from .models import SysGroup, SysGroupMenu, SysMenu, SysUser, SysUserGroup
@@ -52,6 +53,15 @@ def normalize_role(value: str) -> str:
     return ""
 
 
+def build_token_payload(user) -> dict:
+    refresh = RefreshToken.for_user(user)
+    return {
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+        "token_type": "Bearer",
+    }
+
+
 @api_view(["POST"])
 @authentication_classes([])
 @permission_classes([])
@@ -92,8 +102,28 @@ def login_view(request):
         "username": user.username,
         "display_name": sys_user.display_name,
         "roles": roles,
+        "token": build_token_payload(user),
     }
     return build_response("login", "登录成功", payload)
+
+
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([])
+def refresh_token_view(request):
+    refresh_token = request.data.get("refresh")
+    if not refresh_token:
+        return build_response("refresh_token", "refresh token 不能为空", [], status.HTTP_400_BAD_REQUEST, 501)
+
+    try:
+        refresh = RefreshToken(refresh_token)
+        payload = {
+            "access": str(refresh.access_token),
+            "token_type": "Bearer",
+        }
+        return build_response("refresh_token", "刷新成功", payload)
+    except TokenError:
+        return build_response("refresh_token", "refresh token 无效或已过期", [], status.HTTP_401_UNAUTHORIZED, 501)
 
 
 @api_view(["POST"])

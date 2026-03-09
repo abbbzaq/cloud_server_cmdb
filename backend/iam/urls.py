@@ -5,6 +5,7 @@ from .views import (
     current_user,
     login_view,
     logout_view,
+    refresh_token_view,
     sys_group_detail,
     sys_group_list_create,
     sys_group_menu_detail,
@@ -19,6 +20,7 @@ from .views import (
 
 urlpatterns = [
     path("login/", login_view, name="iam-login"),
+    path("token/refresh/", refresh_token_view, name="iam-token-refresh"),
     path("logout/", logout_view, name="iam-logout"),
     path("me/", current_user, name="iam-current-user"),
     path("users/", sys_user_list_create, name="sysuser-list-create"),

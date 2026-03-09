@@ -90,7 +90,7 @@ docker compose up -d --build
 访问地址：
 
 - 前端：`http://127.0.0.1:3000`
-- 后端 API：`http://127.0.0.1:8000`
+- 后端 API：`http://127.0.0.1:8001`
 - 管理后台：`http://127.0.0.1:3000/admin/`（由前端 Nginx 反向代理）
 
 停止服务：
@@ -152,6 +152,32 @@ Compose 配置校验：
 ```bash
 docker compose config
 ```
+
+## 云资源同步（后端）
+
+同步（腾讯云/UCloud Mock + 阿里云真实接口）：
+
+```bash
+cd backend
+python manage.py sync_cloud_instances --provider tencent --account-id tencent-001 --project-name default --region ap-guangzhou
+python manage.py sync_cloud_instances --provider ucloud --account-id ucloud-001 --project-name default --region cn-bj2
+```
+
+真实阿里云同步（ECS）：
+
+```bash
+cd backend
+export ALIYUN_ACCESS_KEY_ID=your-ak
+export ALIYUN_ACCESS_KEY_SECRET=your-sk
+python manage.py sync_cloud_instances --provider aliyun --account-id prod-001 --project-name prod --region cn-hangzhou
+```
+
+HTTP 接口：
+
+- `POST /api/v1/assets/instances/sync/aliyun/`
+- `POST /api/v1/assets/instances/sync/tencent/`
+- `POST /api/v1/assets/instances/sync/ucloud/`
+- `GET /api/v1/assets/instances/{id}/topology/`
 
 ## 开发规范
 
